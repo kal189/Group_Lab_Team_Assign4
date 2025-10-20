@@ -7,15 +7,9 @@
  *
  * @author User
  */
-public class Main {
-       public static void main(String[] args) {
-        
-        Member2.main(args);
-        Member3.main(args);
-        // Uncomment when done
-        // Member1.main(args);
-        
-        
-    }
+public class Member3 {
+    public static void main(String[] args) {
+    System.out.println("Hello from Member 3!");
+  }
     
 }
