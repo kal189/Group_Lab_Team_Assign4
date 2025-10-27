@@ -21,6 +21,9 @@ public class StudentProfile {
     Transcript transcript;
     EmploymentHistroy employmenthistory;
     Department department;
+    
+    
+    
 
     public StudentProfile(Person p, Department d) {
 
@@ -29,6 +32,7 @@ public class StudentProfile {
         transcript = new Transcript(this);
         employmenthistory = new EmploymentHistroy();
     }
+    
     public StudentProfile(Person p) {
     person = p;
     transcript = new Transcript(this);
@@ -38,6 +42,7 @@ public class StudentProfile {
     public boolean isMatch(String id) {
         return person.getPersonId().equals(id);
     }
+    
 
     public Transcript getTranscript() {
         return transcript;
