@@ -90,5 +90,7 @@ public class Transcript {
         return temp2;
 
     }
-
+public void setCurrentCourseLoad(CourseLoad cl) {
+    this.currentcourseload = cl;
+}
 }

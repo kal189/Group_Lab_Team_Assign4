@@ -13,6 +13,12 @@ package UserInterface.WorkAreas.StudentRole;
 import Business.Business;
 import Business.Profiles.StudentProfile;
 import javax.swing.JPanel;
+import java.awt.CardLayout;
+import info5100.university.example.Department.Department;
+import UserInterface.WorkAreas.StudentRole.StudentCourseRegistrationJPanel;
+
+
+
 
 /**
  *
@@ -197,8 +203,14 @@ private info5100.university.example.Persona.StudentProfile universityStudent; //
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
         // TODO add your handling code here:
+  Department department = universityStudent.getDepartment();
 
-        CardSequencePanel.removeAll();
+    StudentCourseRegistrationJPanel registrationPanel =
+        new StudentCourseRegistrationJPanel(department, universityStudent);
+
+    CardSequencePanel.add("StudentCourseRegistration", registrationPanel);
+    java.awt.CardLayout layout = (java.awt.CardLayout) CardSequencePanel.getLayout();
+    layout.show(CardSequencePanel, "StudentCourseRegistration");
 }//GEN-LAST:event_jButton11ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed

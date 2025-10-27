@@ -25,8 +25,8 @@ public class StudentDirectory {
     }
 
     public StudentProfile newStudentProfile(Person p) {
-
-        StudentProfile sp = new StudentProfile(p);
+        
+         StudentProfile sp = new StudentProfile(p, department); 
         studentlist.add(sp);
         return sp;
     }

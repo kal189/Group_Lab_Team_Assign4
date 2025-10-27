@@ -72,6 +72,11 @@ public class StudentCourseRegistrationJPanel extends javax.swing.JPanel {
         });
 
         btnSearch.setText("Search");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
 
         tblCourses.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -87,8 +92,18 @@ public class StudentCourseRegistrationJPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tblCourses);
 
         btnEnroll.setText("Enroll");
+        btnEnroll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEnrollActionPerformed(evt);
+            }
+        });
 
         btnDrop.setText("Drop Course");
+        btnDrop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDropActionPerformed(evt);
+            }
+        });
 
         lblCredits.setText("Total enrolled credits");
 
@@ -160,6 +175,139 @@ public class StudentCourseRegistrationJPanel extends javax.swing.JPanel {
     private void cmbSearchTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSearchTypeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbSearchTypeActionPerformed
+
+    private void btnEnrollActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnrollActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = tblCourses.getSelectedRow();
+    if (selectedRow < 0) {
+        JOptionPane.showMessageDialog(this, "Please select a course to enroll.");
+        return;
+    }
+
+    String courseId = (String) tblCourses.getValueAt(selectedRow, 0);
+    CourseSchedule courseSchedule = department.getCourseSchedule("Fall2025");
+    CourseOffer selectedOffer = courseSchedule.getCourseOfferByNumber(courseId);
+
+    if (selectedOffer == null) {
+        JOptionPane.showMessageDialog(this, "Course not found in schedule.");
+        return;
+    }
+
+    // Current semester course load
+    CourseLoad currentLoad = studentProfile.getCurrentCourseLoad();
+    if (currentLoad == null) {
+        currentLoad = new CourseLoad("Fall2025");
+       studentProfile.getTranscript().setCurrentCourseLoad(currentLoad);
+
+    }
+
+    // Calculate current credit hours
+    int totalCredits = 0;
+    for (SeatAssignment sa : currentLoad.getSeatAssignments()) {
+        totalCredits += sa.getCreditHours();
+    }
+
+    int newCredits = selectedOffer.getCreditHours();
+    if (totalCredits + newCredits > 8) {
+        JOptionPane.showMessageDialog(this, "You cannot enroll in more than 8 credit hours per semester.");
+        return;
+    }
+
+    SeatAssignment newSeat = selectedOffer.assignEmptySeat(currentLoad);
+    if (newSeat == null) {
+        JOptionPane.showMessageDialog(this, "No available seats in this course.");
+        return;
+    }
+
+    JOptionPane.showMessageDialog(this, "Successfully enrolled in: " + courseId);
+    updateEnrolledCredits();
+       
+    }//GEN-LAST:event_btnEnrollActionPerformed
+
+    private void btnDropActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDropActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = tblCourses.getSelectedRow();
+    if (selectedRow < 0) {
+        JOptionPane.showMessageDialog(this, "Please select a course to drop.");
+        return;
+    }
+
+    String courseId = (String) tblCourses.getValueAt(selectedRow, 0);
+    CourseLoad currentLoad = studentProfile.getCurrentCourseLoad();
+
+    if (currentLoad == null) {
+        JOptionPane.showMessageDialog(this, "You are not enrolled in any courses.");
+        return;
+    }
+
+    // Find the course to drop
+    SeatAssignment seatToDrop = null;
+    for (SeatAssignment sa : currentLoad.getSeatAssignments()) {
+        if (sa.getCourseOffer().getCourseNumber().equals(courseId)) {
+            seatToDrop = sa;
+            break;
+        }
+    }
+
+    if (seatToDrop == null) {
+        JOptionPane.showMessageDialog(this, "You are not enrolled in this course.");
+        return;
+    }
+
+    // Drop logic: remove from list
+    currentLoad.getSeatAssignments().remove(seatToDrop);
+    seatToDrop.getSeat().setOccupied(false); // mark seat available again
+
+    JOptionPane.showMessageDialog(this, "Dropped course: " + courseId);
+    updateEnrolledCredits();
+    }//GEN-LAST:event_btnDropActionPerformed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        String searchText = txtSearch.getText().trim().toLowerCase();
+    String searchType = (String) cmbSearchType.getSelectedItem();
+    CourseSchedule schedule = department.getCourseSchedule("Fall2025");
+
+    DefaultTableModel model = (DefaultTableModel) tblCourses.getModel();
+    model.setRowCount(0);
+
+    if (schedule == null) return;
+
+    try {
+        java.lang.reflect.Field scheduleField = CourseSchedule.class.getDeclaredField("schedule");
+        scheduleField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        ArrayList<CourseOffer> offers = (ArrayList<CourseOffer>) scheduleField.get(schedule);
+
+        for (CourseOffer offer : offers) {
+            if (offer == null || offer.getSubjectCourse() == null) continue;
+            String courseId = offer.getCourseNumber().toLowerCase();
+            String courseName = offer.getSubjectCourse().getCourseName().toLowerCase();
+
+            boolean match = false;
+            if (searchType.equals("Course ID") && courseId.contains(searchText)) match = true;
+            if (searchType.equals("Teacher")) {
+                String instructor = "";
+                if (offer.getFacultyProfile() != null && offer.getFacultyProfile().getPerson() != null) {
+                    instructor = offer.getFacultyProfile().getPerson().getName().toLowerCase();
+                }
+                if (instructor.contains(searchText)) match = true;
+            }
+
+            if (match) {
+                model.addRow(new Object[]{
+                    offer.getCourseNumber(),
+                    offer.getSubjectCourse().getCourseName(),
+                    offer.getFacultyProfile() != null ? offer.getFacultyProfile().getPerson().getName() : "Unassigned",
+                    offer.getCreditHours(),
+                    offer.getSubjectCourse().getCredits()
+                });
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    }//GEN-LAST:event_btnSearchActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
