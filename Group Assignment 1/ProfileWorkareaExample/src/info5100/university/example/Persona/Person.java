@@ -13,6 +13,33 @@ public class Person {
     
     String id;
     String name;
+    private String personName;
+private String email;
+private String phone;
+
+public String getPersonName() {
+    return personName;
+}
+
+public void setPersonName(String personName) {
+    this.personName = personName;
+}
+
+public String getEmail() {
+    return email;
+}
+
+public void setEmail(String email) {
+    this.email = email;
+}
+
+public String getPhone() {
+    return phone;
+}
+
+public void setPhone(String phone) {
+    this.phone = phone;
+}
     
     public Person (String id){
         

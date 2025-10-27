@@ -3,6 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package UserInterface.WorkAreas.StudentRole;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.CardLayout;
+import java.util.ArrayList;
+import info5100.university.example.CourseSchedule.CourseLoad;
+import info5100.university.example.CourseSchedule.SeatAssignment;
 
 /**
  *
@@ -18,8 +24,66 @@ public class StudentGraduationAuditPanel extends javax.swing.JPanel {
 public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentProfile universityStudent) {
     initComponents();
     this.universityStudent = universityStudent;
-    // populateGraduationAudit();
+    populateGraduationAudit();
 }
+private void populateGraduationAudit() {
+    DefaultTableModel model = (DefaultTableModel) tblAudit.getModel();
+    model.setRowCount(0);
+    model.setColumnIdentifiers(new String[]{"Course ID", "Course Name", "Credits", "Grade"});
+
+    if (universityStudent == null || universityStudent.getTranscript() == null) {
+        JOptionPane.showMessageDialog(this, "No transcript data found.");
+        return;
+    }
+
+    ArrayList<CourseLoad> courseLoads = new ArrayList<>(universityStudent.getTranscript().getAllCourseLoads());
+    int totalCredits = 0;
+    boolean hasCoreCourse = false;
+
+    for (CourseLoad cl : courseLoads) {
+        for (SeatAssignment sa : cl.getSeatAssignments()) {
+            String courseId = sa.getCourseOffer().getCourseNumber();
+            String courseName = sa.getCourseOffer().getSubjectCourse().getName();
+            int credits = sa.getCourseOffer().getSubjectCourse().getCredits();
+            String grade = convertScoreToLetter(sa.GetCourseStudentScore());
+
+            totalCredits += credits;
+            if (courseId.equalsIgnoreCase("INFO 5100")) {
+                hasCoreCourse = true;
+            }
+
+            model.addRow(new Object[]{courseId, courseName, credits, grade});
+        }
+    }
+
+    // Calculate remaining credits
+    int remainingCredits = 32 - totalCredits;
+    if (remainingCredits < 0) remainingCredits = 0;
+
+    // Graduation status logic
+    String status;
+    if (totalCredits >= 32 && hasCoreCourse) {
+        status = "✅ Ready to Graduate";
+    } else {
+        status = "⏳ In Progress";
+    }
+
+    // Update labels
+    jLabel2.setText("Total Completed Credits: " + totalCredits);
+    jLabel3.setText("Remaining Credits: " + remainingCredits + " | " + status);
+}
+private String convertScoreToLetter(double score) {
+    if (score >= 90) return "A";
+    if (score >= 85) return "A−";
+    if (score >= 80) return "B+";
+    if (score >= 75) return "B";
+    if (score >= 70) return "B−";
+    if (score >= 65) return "C+";
+    if (score >= 60) return "C";
+    if (score >= 55) return "C−";
+    return "F";
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,14 +96,14 @@ public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentPr
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblCourses = new javax.swing.JTable();
+        tblAudit = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
 
         jLabel1.setText("Graduation Audit");
 
-        tblCourses.setModel(new javax.swing.table.DefaultTableModel(
+        tblAudit.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -50,13 +114,18 @@ public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentPr
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tblCourses);
+        jScrollPane1.setViewportView(tblAudit);
 
         jLabel2.setText("Total completed credits");
 
         jLabel3.setText("Remaining credits");
 
         btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -97,6 +166,13 @@ public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentPr
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+        java.awt.Container parent = this.getParent();
+    CardLayout layout = (CardLayout) parent.getLayout();
+    layout.previous(parent);
+    }//GEN-LAST:event_btnBackActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
@@ -104,6 +180,6 @@ public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentPr
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblCourses;
+    private javax.swing.JTable tblAudit;
     // End of variables declaration//GEN-END:variables
 }
