@@ -3,6 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package UserInterface.WorkAreas.StudentRole;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.CardLayout;
+import java.util.ArrayList;
+import java.util.Date;
+import info5100.university.example.CourseSchedule.CourseLoad;
+import info5100.university.example.CourseSchedule.SeatAssignment;
 
 /**
  *
@@ -14,12 +21,43 @@ public class StudentFinancialJPanel extends javax.swing.JPanel {
      * Creates new form StudentFinancialJPanel
      */
     private info5100.university.example.Persona.StudentProfile universityStudent;
+    private double outstandingBalance = 0.0;
+private ArrayList<String[]> paymentHistory = new ArrayList<>();
 
 public StudentFinancialJPanel(info5100.university.example.Persona.StudentProfile universityStudent) {
     initComponents();
     this.universityStudent = universityStudent;
-    // populateFinancialTable();
+     btnPayTuition.addActionListener(evt -> btnPayTuitionActionPerformed(evt));
+    btnBack.addActionListener(evt -> btnBackActionPerformed(evt));
+    populateFinancialTable();
+updateOutstandingBalance();
 }
+private void populateFinancialTable() {
+    DefaultTableModel model = (DefaultTableModel) tblHistory.getModel();
+    model.setRowCount(0);
+    model.setColumnIdentifiers(new String[]{"Course ID", "Course Name", "Tuition ($)", "Status"});
+
+    if (universityStudent == null || universityStudent.getTranscript() == null) {
+        JOptionPane.showMessageDialog(this, "No student data found.");
+        return;
+    }
+
+    outstandingBalance = 0;
+    ArrayList<CourseLoad> courseLoads = new ArrayList<>(universityStudent.getTranscript().getAllCourseLoads());
+
+    for (CourseLoad cl : courseLoads) {
+        for (SeatAssignment sa : cl.getSeatAssignments()) {
+            String courseId = sa.getCourseOffer().getCourseNumber();
+            String courseName = sa.getCourseOffer().getSubjectCourse().getName();
+
+            double courseFee = sa.getCourseOffer().getSubjectCourse().getCredits() * 1000.0; // $1000 per credit hour
+            outstandingBalance += courseFee;
+
+            model.addRow(new Object[]{courseId, courseName, courseFee, "Unpaid"});
+        }
+    }
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -42,6 +80,11 @@ public StudentFinancialJPanel(info5100.university.example.Persona.StudentProfile
         jLabel2.setText("Outstanding balance: ");
 
         btnPayTuition.setText("Make payment");
+        btnPayTuition.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPayTuitionActionPerformed(evt);
+            }
+        });
 
         tblHistory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -57,6 +100,11 @@ public StudentFinancialJPanel(info5100.university.example.Persona.StudentProfile
         jScrollPane1.setViewportView(tblHistory);
 
         btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -97,6 +145,64 @@ public StudentFinancialJPanel(info5100.university.example.Persona.StudentProfile
                 .addContainerGap(207, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnPayTuitionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPayTuitionActionPerformed
+        // TODO add your handling code here:
+        if (outstandingBalance <= 0) {
+        JOptionPane.showMessageDialog(this, "No outstanding balance to pay!");
+        return;
+    }
+
+    String input = JOptionPane.showInputDialog(this, "Enter payment amount ($):");
+    if (input == null || input.trim().isEmpty()) return;
+
+    try {
+        double payment = Double.parseDouble(input);
+        if (payment <= 0) {
+            JOptionPane.showMessageDialog(this, "Invalid amount entered.");
+            return;
+        }
+
+        if (payment > outstandingBalance) {
+            JOptionPane.showMessageDialog(this, "Amount exceeds outstanding balance!");
+            return;
+        }
+
+        outstandingBalance -= payment;
+        paymentHistory.add(new String[]{
+            new java.text.SimpleDateFormat("MM/dd/yyyy").format(new Date()),
+            "$" + payment,
+            "Tuition Payment"
+        });
+
+        JOptionPane.showMessageDialog(this, "Payment successful! Remaining balance: $" + String.format("%.2f", outstandingBalance));
+        updateOutstandingBalance();
+        populatePaymentHistory();
+
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Please enter a valid number.");
+    }
+    
+    }//GEN-LAST:event_btnPayTuitionActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+          java.awt.Container parent = this.getParent();
+    CardLayout layout = (CardLayout) parent.getLayout();
+    layout.previous(parent);
+    }//GEN-LAST:event_btnBackActionPerformed
+private void populatePaymentHistory() {
+    DefaultTableModel model = (DefaultTableModel) tblHistory.getModel();
+    model.setRowCount(0);
+    model.setColumnIdentifiers(new String[]{"Date", "Amount", "Description"});
+
+    for (String[] entry : paymentHistory) {
+        model.addRow(entry);
+    }
+}
+private void updateOutstandingBalance() {
+    jLabel2.setText("Outstanding balance: $" + String.format("%.2f", outstandingBalance));
+}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
