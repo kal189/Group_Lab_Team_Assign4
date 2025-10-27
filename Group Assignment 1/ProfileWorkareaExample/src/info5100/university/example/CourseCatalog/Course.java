@@ -39,5 +39,8 @@
         public String getCourseName() {
     return name;
 }
+        public String getName() {
+    return name;   // assuming your variable for course name is 'name'
+}
 
     }

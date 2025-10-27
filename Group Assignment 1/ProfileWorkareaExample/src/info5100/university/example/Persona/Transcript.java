@@ -93,4 +93,7 @@ public class Transcript {
 public void setCurrentCourseLoad(CourseLoad cl) {
     this.currentcourseload = cl;
 }
+public java.util.Collection<CourseLoad> getAllCourseLoads() {
+    return courseloadlist.values();
+}
 }

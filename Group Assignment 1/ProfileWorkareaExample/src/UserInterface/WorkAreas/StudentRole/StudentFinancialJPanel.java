@@ -8,17 +8,17 @@ package UserInterface.WorkAreas.StudentRole;
  *
  * @author User
  */
-public class StudentGraduationAuditPanel extends javax.swing.JPanel {
+public class StudentFinancialJPanel extends javax.swing.JPanel {
 
     /**
-     * Creates new form StudentGraduationAuditPanel
+     * Creates new form StudentFinancialJPanel
      */
     private info5100.university.example.Persona.StudentProfile universityStudent;
 
-public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentProfile universityStudent) {
+public StudentFinancialJPanel(info5100.university.example.Persona.StudentProfile universityStudent) {
     initComponents();
     this.universityStudent = universityStudent;
-    // populateGraduationAudit();
+    // populateFinancialTable();
 }
 
     /**
@@ -31,15 +31,19 @@ public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentPr
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblCourses = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        btnPayTuition = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblHistory = new javax.swing.JTable();
         btnBack = new javax.swing.JButton();
 
-        jLabel1.setText("Graduation Audit");
+        jLabel1.setText("My tuition and payements");
 
-        tblCourses.setModel(new javax.swing.table.DefaultTableModel(
+        jLabel2.setText("Outstanding balance: ");
+
+        btnPayTuition.setText("Make payment");
+
+        tblHistory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -50,11 +54,7 @@ public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentPr
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tblCourses);
-
-        jLabel2.setText("Total completed credits");
-
-        jLabel3.setText("Remaining credits");
+        jScrollPane1.setViewportView(tblHistory);
 
         btnBack.setText("Back");
 
@@ -65,45 +65,46 @@ public StudentGraduationAuditPanel(info5100.university.example.Persona.StudentPr
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(241, 241, 241)
+                        .addGap(221, 221, 221)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(44, 44, 44)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(55, 55, 55)
+                        .addComponent(jLabel2))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(59, 59, 59)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel2)))
+                        .addGap(45, 45, 45)
+                        .addComponent(btnPayTuition))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(35, 35, 35)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(65, 65, 65)
                         .addComponent(btnBack)))
-                .addContainerGap(63, Short.MAX_VALUE))
+                .addContainerGap(50, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addGap(22, 22, 22)
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(38, 38, 38)
                 .addComponent(jLabel2)
-                .addGap(30, 30, 30)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
+                .addGap(28, 28, 28)
+                .addComponent(btnPayTuition)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(58, 58, 58)
                 .addComponent(btnBack)
-                .addGap(71, 71, 71))
+                .addContainerGap(207, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnPayTuition;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblCourses;
+    private javax.swing.JTable tblHistory;
     // End of variables declaration//GEN-END:variables
 }

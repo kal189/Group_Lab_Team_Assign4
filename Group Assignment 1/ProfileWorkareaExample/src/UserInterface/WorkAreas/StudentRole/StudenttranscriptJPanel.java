@@ -4,6 +4,15 @@
  */
 package UserInterface.WorkAreas.StudentRole;
 
+import javax.swing.*;
+import info5100.university.example.Persona.StudentProfile;
+import info5100.university.example.CourseSchedule.CourseLoad;
+import info5100.university.example.CourseSchedule.SeatAssignment;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+import info5100.university.example.Persona.Transcript;
+
+
 /**
  *
  * @author User
@@ -13,9 +22,12 @@ public class StudenttranscriptJPanel extends javax.swing.JPanel {
     /**
      * Creates new form StudenttranscriptJPanel
      */
-    public StudenttranscriptJPanel() {
-        initComponents();
-    }
+    private info5100.university.example.Persona.StudentProfile universityStudent;
+    public StudenttranscriptJPanel(info5100.university.example.Persona.StudentProfile universityStudent) {
+    initComponents();
+    this.universityStudent = universityStudent;
+     populateTranscriptTable();
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -26,19 +38,176 @@ public class StudenttranscriptJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblTranscript = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
+        btnBack = new javax.swing.JButton();
+
+        jLabel1.setText("My transcript");
+
+        tblTranscript.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(tblTranscript);
+
+        jLabel2.setText("Cumulative GPA");
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(231, 231, 231)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(95, 95, 95)
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(81, 81, 81)
+                        .addComponent(btnBack)))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel1)
+                .addGap(29, 29, 29)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addComponent(jLabel2)
+                .addGap(46, 46, 46)
+                .addComponent(btnBack)
+                .addContainerGap(125, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+          java.awt.Container parent = this.getParent();
+    java.awt.CardLayout layout = (java.awt.CardLayout) parent.getLayout();
+    layout.previous(parent);
+    }//GEN-LAST:event_btnBackActionPerformed
+private void populateTranscriptTable() {
+    DefaultTableModel model = (DefaultTableModel) tblTranscript.getModel();
+    model.setRowCount(0);
+
+    // Set proper column headers
+    model.setColumnIdentifiers(new String[] {
+        "Term", "Course ID", "Course Name", "Grade", "Credits", "Term GPA", "Overall GPA", "Standing"
+    });
+
+    if (universityStudent == null || universityStudent.getTranscript() == null) {
+        System.out.println("Transcript or student not found.");
+        return;
+    }
+
+    ArrayList<CourseLoad> courseLoads = new ArrayList<>(universityStudent.getTranscript().getAllCourseLoads());
+    double totalQualityPointsAll = 0;
+    double totalCreditsAll = 0;
+
+    for (CourseLoad cl : courseLoads) {
+        double termQualityPoints = 0;
+        double termCredits = 0;
+
+        for (SeatAssignment sa : cl.getSeatAssignments()) {
+            double gradePoint = convertScoreToGPA(sa.GetCourseStudentScore());
+            int creditHours = sa.getCourseOffer().getSubjectCourse().getCredits();
+
+            termQualityPoints += gradePoint * creditHours;
+            termCredits += creditHours;
+
+            totalQualityPointsAll += gradePoint * creditHours;
+            totalCreditsAll += creditHours;
+
+            String gradeLetter = convertScoreToLetter(sa.GetCourseStudentScore());
+            model.addRow(new Object[]{
+                cl.getSemester(),
+                sa.getCourseOffer().getCourseNumber(),
+                sa.getCourseOffer().getSubjectCourse().getName(),
+                gradeLetter,
+                creditHours,
+                "-", "-", "-" // placeholders; we’ll fill after term loop
+            });
+        }
+
+        double termGPA = (termCredits > 0) ? (termQualityPoints / termCredits) : 0.0;
+        double overallGPA = (totalCreditsAll > 0) ? (totalQualityPointsAll / totalCreditsAll) : 0.0;
+        String standing = determineStanding(termGPA, overallGPA);
+
+        // Update the last few rows belonging to this term with GPA and standing
+        for (int i = model.getRowCount() - (int) cl.getSeatAssignments().size(); i < model.getRowCount(); i++) {
+            model.setValueAt(String.format("%.2f", termGPA), i, 5);
+            model.setValueAt(String.format("%.2f", overallGPA), i, 6);
+            model.setValueAt(standing, i, 7);
+        }
+    }
+
+    // Display cumulative GPA
+    double cumulativeGPA = (totalCreditsAll > 0) ? (totalQualityPointsAll / totalCreditsAll) : 0.0;
+    jLabel2.setText("Cumulative GPA: " + String.format("%.2f", cumulativeGPA));
+}
+private double convertScoreToGPA(double score) {
+    if (score >= 90) return 4.0;
+    if (score >= 85) return 3.7;
+    if (score >= 80) return 3.3;
+    if (score >= 75) return 3.0;
+    if (score >= 70) return 2.7;
+    if (score >= 65) return 2.3;
+    if (score >= 60) return 2.0;
+    if (score >= 55) return 1.7;
+    return 0.0;
+}
+
+private String convertScoreToLetter(double score) {
+    if (score >= 90) return "A";
+    if (score >= 85) return "A−";
+    if (score >= 80) return "B+";
+    if (score >= 75) return "B";
+    if (score >= 70) return "B−";
+    if (score >= 65) return "C+";
+    if (score >= 60) return "C";
+    if (score >= 55) return "C−";
+    return "F";
+}
+
+private String determineStanding(double termGPA, double overallGPA) {
+    if (termGPA >= 3.0 && overallGPA >= 3.0)
+        return "Good Standing";
+    else if (termGPA < 3.0 && overallGPA >= 3.0)
+        return "Academic Warning";
+    else
+        return "Academic Probation";
+}   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblTranscript;
     // End of variables declaration//GEN-END:variables
 }

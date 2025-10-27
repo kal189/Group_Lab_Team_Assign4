@@ -16,6 +16,12 @@ import javax.swing.JPanel;
 import java.awt.CardLayout;
 import info5100.university.example.Department.Department;
 import UserInterface.WorkAreas.StudentRole.StudentCourseRegistrationJPanel;
+import UserInterface.WorkAreas.StudentRole.StudentCourseWorkJPanel;
+import UserInterface.WorkAreas.StudentRole.StudentCourseRegistrationJPanel;
+import UserInterface.WorkAreas.StudentRole.StudentFinancialJPanel;
+import UserInterface.WorkAreas.StudentRole.StudentGraduationAuditPanel;
+import UserInterface.WorkAreas.StudentRole.StudentProfilePanel;
+import UserInterface.WorkAreas.StudentRole.StudenttranscriptJPanel;
 
 
 
@@ -67,6 +73,7 @@ private info5100.university.example.Persona.StudentProfile universityStudent; //
         jButton11 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jButton12 = new javax.swing.JButton();
+        btnFinancials = new javax.swing.JButton();
 
         setForeground(new java.awt.Color(51, 51, 51));
 
@@ -143,6 +150,20 @@ private info5100.university.example.Persona.StudentProfile universityStudent; //
             }
         });
 
+        btnFinancials.setBackground(new java.awt.Color(102, 153, 255));
+        btnFinancials.setFont(getFont());
+        btnFinancials.setForeground(new java.awt.Color(255, 255, 255));
+        btnFinancials.setText("Financials");
+        btnFinancials.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnFinancials.setMaximumSize(new java.awt.Dimension(200, 40));
+        btnFinancials.setMinimumSize(new java.awt.Dimension(20, 20));
+        btnFinancials.setPreferredSize(new java.awt.Dimension(240, 25));
+        btnFinancials.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFinancialsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -153,13 +174,15 @@ private info5100.university.example.Persona.StudentProfile universityStudent; //
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jButton12, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(jButton12, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
                             .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
                             .addComponent(jButton9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
                         .addGap(75, 75, 75)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jButton11, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                                .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                            .addComponent(btnFinancials, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(590, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -176,7 +199,9 @@ private info5100.university.example.Persona.StudentProfile universityStudent; //
                     .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(43, 43, 43)
-                .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFinancials, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(122, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -190,20 +215,38 @@ private info5100.university.example.Persona.StudentProfile universityStudent; //
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         // TODO add your handling code here:    
-
+           StudentProfilePanel panel = new StudentProfilePanel(universityStudent);
+    CardSequencePanel.add("StudentProfile", panel);
+    ((java.awt.CardLayout) CardSequencePanel.getLayout()).show(CardSequencePanel, "StudentProfile");
 
 
 }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         // TODO add your handling code here:
+       StudentGraduationAuditPanel panel = new StudentGraduationAuditPanel(universityStudent);
+    CardSequencePanel.add("StudentGraduationAudit", panel);
+    ((java.awt.CardLayout) CardSequencePanel.getLayout()).show(CardSequencePanel, "StudentGraduationAudit");
 
 
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
         // TODO add your handling code here:
-  Department department = universityStudent.getDepartment();
+     info5100.university.example.Department.Department department = null;
+    
+    try {
+        department = universityStudent.getDepartment(); 
+    } catch (Exception e) {
+        System.out.println("Department not found in StudentProfile. Creating fallback department.");
+        department = new info5100.university.example.Department.Department("Information Systems");
+    }
+
+    if (department == null) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Department not linked to student. Please contact admin.");
+        return;
+    }
 
     StudentCourseRegistrationJPanel registrationPanel =
         new StudentCourseRegistrationJPanel(department, universityStudent);
@@ -215,10 +258,22 @@ private info5100.university.example.Persona.StudentProfile universityStudent; //
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
         // TODO add your handling code here:
+         StudenttranscriptJPanel panel = new StudenttranscriptJPanel(universityStudent);
+    CardSequencePanel.add("StudentTranscript", panel);
+    ((java.awt.CardLayout) CardSequencePanel.getLayout()).show(CardSequencePanel, "StudentTranscript");
     }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void btnFinancialsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinancialsActionPerformed
+        // TODO add your handling code here:
+         StudentFinancialJPanel panel =
+        new StudentFinancialJPanel(universityStudent);
+    CardSequencePanel.add("StudentFinancial", panel);
+    ((java.awt.CardLayout) CardSequencePanel.getLayout()).show(CardSequencePanel, "StudentFinancial");
+    }//GEN-LAST:event_btnFinancialsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFinancials;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
