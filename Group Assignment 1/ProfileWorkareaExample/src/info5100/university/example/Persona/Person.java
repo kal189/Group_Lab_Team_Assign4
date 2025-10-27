@@ -12,6 +12,8 @@ package info5100.university.example.Persona;
 public class Person {
     
     String id;
+    String name;
+    
     public Person (String id){
         
         this.id = id;
@@ -24,5 +26,11 @@ public class Person {
         if(getPersonId().equals(id)) return true;
         return false;
     }
-    
+    public String getName(){
+        return name;
+    }
+    public void setName (String name) {
+        this.name = name;
+        
+    }
 }

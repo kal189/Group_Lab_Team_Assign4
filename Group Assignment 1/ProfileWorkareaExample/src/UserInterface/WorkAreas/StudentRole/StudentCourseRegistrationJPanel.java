@@ -8,13 +8,33 @@ package UserInterface.WorkAreas.StudentRole;
  *
  * @author User
  */
+
+import info5100.university.example.CourseSchedule.CourseLoad;
+import info5100.university.example.CourseSchedule.CourseOffer;
+import info5100.university.example.CourseSchedule.CourseSchedule;
+import info5100.university.example.CourseSchedule.SeatAssignment;
+import info5100.university.example.CourseSchedule.Seat;
+import info5100.university.example.Department.Department;
+import info5100.university.example.Persona.StudentProfile;
+import info5100.university.example.CourseCatalog.Course;
+import info5100.university.example.Persona.Faculty.FacultyProfile;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+
 public class StudentCourseRegistrationJPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form StudentCourseRegistrationJPanel
      */
-    public StudentCourseRegistrationJPanel() {
+    private Department department;
+    private StudentProfile studentProfile;
+    public StudentCourseRegistrationJPanel(Department department, StudentProfile studentProfile) {
         initComponents();
+        this.department = department;
+        this.studentProfile = studentProfile;
+        populateCourseTable(department.getCourseSchedule("Fall2025"));
     }
 
     /**
@@ -155,4 +175,94 @@ public class StudentCourseRegistrationJPanel extends javax.swing.JPanel {
     private javax.swing.JTable tblCourses;
     private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
+
+   private void populateCourseTable(CourseSchedule courseSchedule) {
+    DefaultTableModel model = (DefaultTableModel) tblCourses.getModel();
+    model.setRowCount(0);
+
+    if (courseSchedule == null) {
+        JOptionPane.showMessageDialog(this, "No course schedule available for this term.");
+        return;
+    }
+
+    model.setColumnIdentifiers(new String[]{
+        "Course ID", "Course Name", "Instructor", "Credits", "Available Seats"
+    });
+
+    try {
+        // Access private schedule list in CourseSchedule
+        java.lang.reflect.Field scheduleField = CourseSchedule.class.getDeclaredField("schedule");
+        scheduleField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        ArrayList<CourseOffer> offers = (ArrayList<CourseOffer>) scheduleField.get(courseSchedule);
+
+        for (CourseOffer offer : offers) {
+            if (offer == null || offer.getSubjectCourse() == null) continue;
+
+            String courseId = offer.getCourseNumber();
+
+            // ✅ Fix 1: Course name getter
+            // (Your Course.java likely has getCourseName() or getCOurseName())
+            String courseName;
+            try {
+                courseName = offer.getSubjectCourse().getCourseName();
+            } catch (Exception e) {
+                // fallback if method name is different
+                courseName = offer.getSubjectCourse().getCOurseNumber();
+            }
+
+            int credits = offer.getCreditHours();
+
+            // ✅ Fix 2: Faculty name getter
+            String instructor = "Unassigned";
+            FacultyProfile facultyProfile = offer.getFacultyProfile();
+            if (facultyProfile != null) {
+                try {
+                    // if Person class has getName()
+                    instructor = facultyProfile.getPerson().getName();
+                } catch (Exception e) {
+                    // fallback in case method name differs
+                    instructor = "Unknown";
+                }
+            }
+
+            // ✅ Seat availability
+            java.lang.reflect.Field seatField = CourseOffer.class.getDeclaredField("seatlist");
+            seatField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            ArrayList<Seat> seats = (ArrayList<Seat>) seatField.get(offer);
+
+            int totalSeats = seats.size();
+            int occupiedSeats = 0;
+            for (Seat s : seats) {
+                if (s.isOccupied()) occupiedSeats++;
+            }
+            int availableSeats = totalSeats - occupiedSeats;
+
+            model.addRow(new Object[]{courseId, courseName, instructor, credits, availableSeats});
+        }
+
+        updateEnrolledCredits();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error populating course table: " + e.getMessage());
+    }
+    
 }
+   private void updateEnrolledCredits() {
+    int totalCredits = 0;
+    CourseLoad currentLoad = studentProfile.getCurrentCourseLoad();
+
+    if (currentLoad != null) {
+        for (SeatAssignment sa : currentLoad.getSeatAssignments()) {
+            if (sa != null) {
+                totalCredits += sa.getCreditHours();
+            }
+        }
+    }
+
+    lblCredits.setText("Total enrolled credits: " + totalCredits);
+}
+}
+
