@@ -157,14 +157,19 @@ public class ProfileWorkAreaMainFrame extends javax.swing.JFrame {
         }
         
         if (profile instanceof StudentProfile) {
+    StudentProfile spp = (StudentProfile) profile;
 
-            StudentProfile spp = (StudentProfile) profile;
-            studentworkareajpanel = new StudentWorkAreaJPanel(business, spp, CardSequencePanel);
-            CardSequencePanel.removeAll();
-            CardSequencePanel.add("student", studentworkareajpanel);
-            ((java.awt.CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
+    // Create the academic record for the student
+    info5100.university.example.Persona.StudentProfile usp =
+            new info5100.university.example.Persona.StudentProfile(
+                  new info5100.university.example.Persona.Person(spp.getPerson().getPersonId()));
 
-        }
+    // Now pass all 4 arguments
+    studentworkareajpanel = new StudentWorkAreaJPanel(business, spp, usp, CardSequencePanel);
+    CardSequencePanel.removeAll();
+    CardSequencePanel.add("student", studentworkareajpanel);
+    ((java.awt.CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
+}
 
  /*      if (profile instanceof FacultyProfile) {
             facultyworkarea = new FacultyWorkAreaJPanel(business, CardSequencePanel);

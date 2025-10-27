@@ -19,10 +19,14 @@ import javax.swing.JPanel;
  * @author kal
  */
 public class StudentWorkAreaJPanel extends javax.swing.JPanel {
+    
 
-    javax.swing.JPanel CardSequencePanel;
-    Business business;
-    StudentProfile student;
+    // ===== Instance variables =====
+private javax.swing.JPanel CardSequencePanel;
+private Business business;
+private StudentProfile student; // Login-level profile
+private info5100.university.example.Persona.StudentProfile universityStudent; // Academic profile
+
 
     /**
      * Creates new form UnitRiskWorkArea
@@ -31,13 +35,15 @@ public class StudentWorkAreaJPanel extends javax.swing.JPanel {
      * @param clp
      */
 
-    public StudentWorkAreaJPanel(Business b, StudentProfile spp, JPanel clp) {
-
-        business = b;
-        this.CardSequencePanel = clp;
-        student = spp;
-        initComponents();
-
+    public StudentWorkAreaJPanel(Business business,
+                             StudentProfile student,
+                             info5100.university.example.Persona.StudentProfile universityStudent,
+                             javax.swing.JPanel CardSequencePanel) {
+    this.business = business;
+    this.student = student;
+    this.universityStudent = universityStudent;
+    this.CardSequencePanel = CardSequencePanel;
+    initComponents();
     }
 
     /**
@@ -170,12 +176,14 @@ public class StudentWorkAreaJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton4IdentifyResourceAssetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4IdentifyResourceAssetsActionPerformed
-        
-
+         StudentCourseWorkJPanel panel =
+        new StudentCourseWorkJPanel(business, student, universityStudent);
+    CardSequencePanel.add("StudentCourseWork", panel);
+    ((java.awt.CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
     }//GEN-LAST:event_jButton4IdentifyResourceAssetsActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here:    
 
 
 
